@@ -13,16 +13,16 @@ app.use(express.json())
 app.use(cors({origin:ENV.CLIENT_URL,credentials:true}))
 app.use("/api/inngest",serve({client:inngest,functions}))
 
-app.get("/",(req,res)=>{
+app.get("/api/health",(req,res)=>{
     res.status(200).json({
         msg:"success from ff apiss 12345 ff"
     })
 })
 
 if(ENV.NODE_ENV==="production"){
-    app.use(express.static(path.join(__dirname,"../frontend/dist")))
+    app.use(express.static(path.join(__dirname,"frontend","dist")))
     app.get("/{*any}",(req,res)=>{
-        res.sendFile(path.join(__dirname,"../frontend","dist","index.html"))
+        res.sendFile(path.join(__dirname,"frontend","dist","index.html"))
     })
 }
 
