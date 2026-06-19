@@ -9,6 +9,7 @@ import path from "path"
 import { protectRoute } from "./middleware/protectRoute.js"
 import chatRoutes from "./routes/chatRoutes.js"
 import sessionRoutes from "./routes/sessionRoutes.js"
+import codeRoutes from "./routes/code.route.js";
 
 const app=express()
 const __dirname=path.resolve()
@@ -19,6 +20,7 @@ app.use(clerkMiddleware())
 app.use("/api/inngest",serve({client:inngest,functions}))
 app.use("/api/chat",chatRoutes)
 app.use("/api/sessions",sessionRoutes)
+app.use("/api/code", codeRoutes);
 
 app.get("/api/health",(req,res)=>{
     res.status(200).json({
