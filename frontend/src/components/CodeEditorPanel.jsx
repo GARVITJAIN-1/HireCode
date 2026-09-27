@@ -11,15 +11,15 @@ function CodeEditorPanel({
   onRunCode,
 }) {
   return (
-    <div className="h-full bg-base-300 flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 bg-base-100 border-t border-base-300">
+    <div className="h-full bg-base-300 flex flex-col min-w-0 min-h-0 overflow-hidden w-full">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-base-100 border-t border-base-300 shrink-0">
         <div className="flex items-center gap-3">
           <img
             src={LANGUAGE_CONFIG[selectedLanguage].icon}
             alt={LANGUAGE_CONFIG[selectedLanguage].name}
-            className="size-6"
+            className="size-5"
           />
-          <select className="select select-sm" value={selectedLanguage} onChange={onLanguageChange}>
+          <select className="select select-sm select-bordered" value={selectedLanguage} onChange={onLanguageChange}>
             {Object.entries(LANGUAGE_CONFIG).map(([key, lang]) => (
               <option key={key} value={key}>
                 {lang.name}
@@ -43,7 +43,7 @@ function CodeEditorPanel({
         </button>
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 min-h-0 min-w-0 overflow-hidden relative">
         <Editor
           height={"100%"}
           language={LANGUAGE_CONFIG[selectedLanguage].monacoLang}

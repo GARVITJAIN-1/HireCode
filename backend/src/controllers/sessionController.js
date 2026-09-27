@@ -25,8 +25,8 @@ export async function createSession(req,res){
         await channel.create()
         res.status(201).json({session})
     } catch (error) {
-        console.log("Error in createSession controller",error.message);
-        res.status(500).json({message:"Internal Server Error"})
+        console.log("Error in createSession controller", error.message);
+        res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 }
 export async function getActiveSessions(_, res) {

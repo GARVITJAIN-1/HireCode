@@ -14,8 +14,20 @@ import codeRoutes from "./routes/code.route.js";
 const app=express()
 const __dirname=path.resolve()
 //middleware
-app.use(express.json())
-app.use(cors({origin:ENV.CLIENT_URL,credentials:true}))
+app.use(express.json());
+const allowedOrigins = [ENV.CLIENT_URL, "http://localhost:5173", "http://localhost:5174"].filter(Boolean);
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin) || origin.startsWith("http://localhost:")) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(clerkMiddleware())
 app.use("/api/inngest",serve({client:inngest,functions}))
 app.use("/api/chat",chatRoutes)

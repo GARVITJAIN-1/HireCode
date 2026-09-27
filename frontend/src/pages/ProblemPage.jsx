@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { PROBLEMS } from "../data/problems";
 import Navbar from "../components/Navbar";
@@ -16,22 +16,23 @@ function ProblemPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [currentProblemId, setCurrentProblemId] = useState("two-sum");
+  const initialProblemId = id && PROBLEMS[id] ? id : "two-sum";
+  const [currentProblemId, setCurrentProblemId] = useState(initialProblemId);
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
-  const [code, setCode] = useState(PROBLEMS[currentProblemId].starterCode.javascript);
+  const [code, setCode] = useState(PROBLEMS[initialProblemId].starterCode.javascript);
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
-
-  const currentProblem = PROBLEMS[currentProblemId];
+  const [prevId, setPrevId] = useState(id);
 
   // update problem when URL param changes
-  useEffect(() => {
-    if (id && PROBLEMS[id]) {
-      setCurrentProblemId(id);
-      setCode(PROBLEMS[id].starterCode[selectedLanguage]);
-      setOutput(null);
-    }
-  }, [id, selectedLanguage]);
+  if (id && PROBLEMS[id] && id !== prevId) {
+    setPrevId(id);
+    setCurrentProblemId(id);
+    setCode(PROBLEMS[id].starterCode[selectedLanguage]);
+    setOutput(null);
+  }
+
+  const currentProblem = PROBLEMS[currentProblemId];
 
   const handleLanguageChange = (e) => {
     const newLang = e.target.value;

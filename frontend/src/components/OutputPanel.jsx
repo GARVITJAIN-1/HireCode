@@ -1,8 +1,8 @@
 function OutputPanel({ output }) {
   return (
-    <div className="h-full bg-base-100 flex flex-col">
-      <div className="px-4 py-2 bg-base-200 border-b border-base-300 font-semibold text-sm">
-        Output
+    <div className="h-full bg-base-100 flex flex-col min-w-0 min-h-0 overflow-hidden w-full">
+      <div className="px-4 py-2 bg-base-200 border-b border-base-300 font-semibold text-xs tracking-wider uppercase text-base-content/70 shrink-0 flex items-center justify-between">
+        <span>Execution Console</span>
       </div>
       <div className="flex-1 overflow-auto p-4">
         {output === null ? (

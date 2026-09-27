@@ -4,7 +4,13 @@ import {
   SpeakerLayout,
   useCallStateHooks,
 } from "@stream-io/video-react-sdk";
-import { Loader2Icon, MessageSquareIcon, UsersIcon, XIcon } from "lucide-react";
+import {
+  Loader2Icon,
+  MessageSquareIcon,
+  UsersIcon,
+  VideoIcon,
+  RowsIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Channel, Chat, MessageComposer, MessageList, Thread, Window } from "stream-chat-react";
@@ -17,87 +23,149 @@ function VideoCallUI({ chatClient, channel }) {
   const { useCallCallingState, useParticipantCount } = useCallStateHooks();
   const callingState = useCallCallingState();
   const participantCount = useParticipantCount();
-  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  // Default to "split" mode so both Video Call and Chat are visible at the same time!
+  const [activeTab, setActiveTab] = useState("split");
 
   if (callingState === CallingState.JOINING) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center">
-          <Loader2Icon className="w-12 h-12 mx-auto animate-spin text-primary mb-4" />
-          <p className="text-lg">Joining call...</p>
+      <div className="h-full flex items-center justify-center bg-base-200/50 rounded-xl p-4">
+        <div className="text-center p-6 bg-base-100 rounded-2xl shadow-lg border border-base-300">
+          <Loader2Icon className="w-10 h-10 mx-auto animate-spin text-primary mb-3" />
+          <h4 className="font-bold text-sm text-base-content">Connecting to Video Call...</h4>
+          <p className="text-xs text-base-content/60 mt-1">Establishing WebRTC connection</p>
         </div>
       </div>
     );
   }
 
+  const hasChat = !!(chatClient && channel);
+
   return (
-    <div className="h-full flex gap-3 relative str-video">
-      <div className="flex-1 flex flex-col gap-3">
-        {/* Participants count badge and Chat Toggle */}
-        <div className="flex items-center justify-between gap-2 bg-base-100 p-3 rounded-lg shadow">
-          <div className="flex items-center gap-2">
-            <UsersIcon className="w-5 h-5 text-primary" />
-            <span className="font-semibold">
-              {participantCount} {participantCount === 1 ? "participant" : "participants"}
-            </span>
+    <div className="h-full flex flex-col gap-2 relative str-video overflow-hidden min-w-0 min-h-0 w-full">
+      {/* COMMUNICATION PANEL HEADER */}
+      <div className="flex items-center justify-between gap-2 bg-base-100 p-2.5 rounded-xl border border-base-300 shadow-xs shrink-0">
+        {/* Participant Count */}
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <UsersIcon className="w-4 h-4 text-primary" />
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-success ring-1 ring-base-100"></span>
           </div>
-          {chatClient && channel && (
+          <span className="font-semibold text-xs text-base-content">
+            {participantCount} {participantCount === 1 ? "participant" : "participants"}
+          </span>
+        </div>
+
+        {/* View Mode Switcher */}
+        {hasChat && (
+          <div className="join bg-base-200 p-0.5 rounded-lg border border-base-300">
             <button
-              onClick={() => setIsChatOpen(!isChatOpen)}
-              className={`btn btn-sm gap-2 ${isChatOpen ? "btn-primary" : "btn-ghost"}`}
-              title={isChatOpen ? "Hide chat" : "Show chat"}
+              type="button"
+              onClick={() => setActiveTab("split")}
+              className={`join-item btn btn-xs gap-1 ${
+                activeTab === "split" ? "btn-primary text-white shadow-xs" : "btn-ghost text-base-content/70"
+              }`}
+              title="Both Video + Chat visible"
             >
-              <MessageSquareIcon className="size-4" />
-              Chat
+              <RowsIcon className="w-3.5 h-3.5" />
+              <span>Split</span>
             </button>
-          )}
-        </div>
 
-        <div className="flex-1 bg-base-300 rounded-lg overflow-hidden relative">
-          <SpeakerLayout />
-        </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab("video")}
+              className={`join-item btn btn-xs gap-1 ${
+                activeTab === "video" ? "btn-primary text-white shadow-xs" : "btn-ghost text-base-content/70"
+              }`}
+              title="Full Video View"
+            >
+              <VideoIcon className="w-3.5 h-3.5" />
+              <span>Video</span>
+            </button>
 
-        <div className="bg-base-100 p-3 rounded-lg shadow flex justify-center">
-          <CallControls onLeave={() => navigate("/dashboard")} />
-        </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab("chat")}
+              className={`join-item btn btn-xs gap-1 ${
+                activeTab === "chat" ? "btn-primary text-white shadow-xs" : "btn-ghost text-base-content/70"
+              }`}
+              title="Full Chat View"
+            >
+              <MessageSquareIcon className="w-3.5 h-3.5" />
+              <span>Chat</span>
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* CHAT SECTION */}
+      {/* MAIN CONTENT AREA */}
+      <div className="flex-1 flex flex-col min-h-0 min-w-0 gap-2 overflow-hidden">
+        {/* VIDEO SECTION */}
+        {(activeTab === "video" || activeTab === "split") && (
+          <div
+            className={`flex flex-col bg-base-300 rounded-xl overflow-hidden relative border border-base-content/10 min-w-0 min-h-0 ${
+              activeTab === "split" ? "flex-1" : "flex-1"
+            }`}
+          >
+            <div className="flex-1 min-h-0 relative overflow-hidden">
+              <SpeakerLayout />
+            </div>
 
-      {chatClient && channel && (
-        <div
-          className={`flex flex-col rounded-lg shadow overflow-hidden bg-[#272a30] transition-all duration-300 ease-in-out ${
-            isChatOpen ? "w-80 opacity-100" : "w-0 opacity-0"
-          }`}
-        >
-          {isChatOpen && (
-            <>
-              <div className="bg-[#1c1e22] p-3 border-b border-[#3a3d44] flex items-center justify-between">
-                <h3 className="font-semibold text-white">Session Chat</h3>
+            {/* In full video mode, show call controls at bottom */}
+            {activeTab === "video" && (
+              <div className="bg-base-100/90 backdrop-blur-xs p-1.5 rounded-b-xl border-t border-base-300 flex justify-center shrink-0">
+                <CallControls onLeave={() => navigate("/dashboard")} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* CHAT SECTION */}
+        {hasChat && (activeTab === "chat" || activeTab === "split") && (
+          <div
+            className={`flex flex-col rounded-xl shadow-xs overflow-hidden bg-[#272a30] border border-[#3a3d44] min-w-0 min-h-0 ${
+              activeTab === "split" ? "flex-1" : "flex-1"
+            }`}
+          >
+            <div className="bg-[#1c1e22] px-3 py-1.5 border-b border-[#3a3d44] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <MessageSquareIcon className="w-3.5 h-3.5 text-primary" />
+                <h4 className="font-semibold text-xs text-white">Live Session Chat</h4>
+              </div>
+              {activeTab === "chat" && (
                 <button
-                  onClick={() => setIsChatOpen(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                  title="Close chat"
+                  type="button"
+                  onClick={() => setActiveTab("split")}
+                  className="btn btn-ghost btn-xs text-xs text-gray-300 hover:text-white"
                 >
-                  <XIcon className="size-5" />
+                  Show Both
                 </button>
-              </div>
-              <div className="flex-1 overflow-hidden stream-chat-dark">
-                <Chat client={chatClient} theme="str-chat__theme-dark">
-                  <Channel channel={channel}>
-                    <Window>
-                      <MessageList />
-                      <MessageComposer />
-                    </Window>
-                    <Thread />
-                  </Channel>
-                </Chat>
-              </div>
-            </>
-          )}
-        </div>
-      )}
+              )}
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-hidden stream-chat-dark">
+              <Chat client={chatClient} theme="str-chat__theme-dark">
+                <Channel channel={channel}>
+                  <Window>
+                    <MessageList />
+                    <MessageComposer />
+                  </Window>
+                  <Thread />
+                </Channel>
+              </Chat>
+            </div>
+          </div>
+        )}
+
+        {/* In split mode, display call controls at very bottom */}
+        {activeTab === "split" && (
+          <div className="bg-base-100 p-1 rounded-xl border border-base-300 shadow-xs flex justify-center shrink-0">
+            <CallControls onLeave={() => navigate("/dashboard")} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
 export default VideoCallUI;
