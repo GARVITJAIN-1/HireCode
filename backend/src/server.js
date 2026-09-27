@@ -11,8 +11,13 @@ import chatRoutes from "./routes/chatRoutes.js"
 import sessionRoutes from "./routes/sessionRoutes.js"
 import codeRoutes from "./routes/code.route.js";
 
-const app=express()
-const __dirname=path.resolve()
+import fs from "fs"
+import { fileURLToPath } from "url"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const app = express()
 //middleware
 app.use(express.json());
 const allowedOrigins = [ENV.CLIENT_URL, "http://localhost:5173", "http://localhost:5174"].filter(Boolean);
@@ -40,11 +45,19 @@ app.get("/api/health",(req,res)=>{
     })
 })
 
-if(ENV.NODE_ENV==="production"){
-    app.use(express.static(path.join(__dirname,"../frontend/dist")))
-    app.get("/{*any}",(req,res)=>{
-        res.sendFile(path.join(__dirname,"frontend","dist","index.html"))
-    })
+if (ENV.NODE_ENV === "production") {
+    const distPath = [
+        path.resolve(__dirname, "../../frontend/dist"),
+        path.resolve(process.cwd(), "frontend/dist"),
+        path.resolve(__dirname, "../frontend/dist"),
+    ].find((p) => fs.existsSync(p)) || path.resolve(__dirname, "../../frontend/dist");
+
+    console.log("Serving static frontend from:", distPath);
+
+    app.use(express.static(distPath));
+    app.get("/{*any}", (req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+    });
 }
 
 const startServer=async()=>{
