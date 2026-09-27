@@ -20,17 +20,18 @@ const __dirname = path.dirname(__filename)
 const app = express()
 //middleware
 app.use(express.json());
-const allowedOrigins = [ENV.CLIENT_URL, "http://localhost:5173", "http://localhost:5174"].filter(Boolean);
+const normalizeOrigin = (url) => url?.trim().replace(/\/+$/, "");
+const allowedOrigins = [ENV.CLIENT_URL, "http://localhost:5173", "http://localhost:5174"]
+  .filter(Boolean)
+  .map(normalizeOrigin);
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || origin.startsWith("http://localhost:")) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
+  cors((req, callback) => {
+    const origin = normalizeOrigin(req.header("Origin"));
+    // the frontend is served by this same server in production, so its own origin is always allowed
+    const sameOrigin = origin === `${req.protocol}://${req.get("host")}` || origin === `https://${req.get("host")}`;
+    const allowed = !origin || sameOrigin || allowedOrigins.includes(origin) || origin.startsWith("http://localhost:");
+    // never throw here: an error turns every request (including JS/CSS assets) into a 500
+    callback(null, { origin: allowed, credentials: true });
   })
 );
 app.use(clerkMiddleware())
