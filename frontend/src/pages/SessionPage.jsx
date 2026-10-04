@@ -201,20 +201,20 @@ function SessionPage() {
   );
 
   return (
-    <div className="h-screen bg-base-100 flex flex-col overflow-hidden w-full">
+    <div className="h-screen bg-[#070a12] text-white flex flex-col overflow-hidden w-full font-mono">
       <Navbar />
 
       {/* SESSION TOP CONTROL RIBBON */}
-      <div className="bg-base-200/90 border-b border-base-300 px-4 py-2 flex items-center justify-between gap-3 shrink-0 shadow-xs z-10">
+      <div className="bg-[#090d16] border-b border-white/10 px-4 py-2 flex items-center justify-between gap-3 shrink-0 shadow-xl z-10">
         {/* Left: Problem info, badges & participants */}
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex items-center gap-2">
-            <h2 className="font-bold text-base text-base-content truncate max-w-[200px] sm:max-w-xs">
+            <h2 className="font-bold text-base text-white truncate max-w-[200px] sm:max-w-xs font-mono">
               {session?.problem || "Interview Room"}
             </h2>
 
             <span
-              className={`badge badge-sm font-semibold ${getDifficultyBadgeClass(
+              className={`badge badge-xs font-mono uppercase tracking-wider py-1 px-2 ${getDifficultyBadgeClass(
                 session?.difficulty
               )}`}
             >
@@ -224,15 +224,15 @@ function SessionPage() {
             </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 text-xs text-base-content/70 border-l border-base-300 pl-3">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+          <div className="hidden md:flex items-center gap-2 text-xs text-white/60 border-l border-white/10 pl-3">
+            <span className="flex items-center gap-1.5 text-emerald-400">
+              <span className="size-2 rounded-full bg-emerald-400 animate-ping"></span>
               Live Session
             </span>
-            <span>•</span>
+            <span className="text-white/30">•</span>
             <span className="flex items-center gap-1">
-              <UsersIcon className="w-3.5 h-3.5 text-primary" />
-              {session?.participant ? "2/2 Connected" : "1/2 Waiting for candidate"}
+              <UsersIcon className="size-3.5 text-cyan-400" />
+              <span>{session?.participant ? "2/2 Peers Connected" : "1/2 Awaiting Candidate"}</span>
             </span>
           </div>
         </div>
@@ -242,15 +242,15 @@ function SessionPage() {
           {/* Copy Invite Link */}
           <button
             onClick={handleCopyInviteLink}
-            className="btn btn-xs sm:btn-sm btn-ghost gap-1.5 text-base-content/80 hover:text-base-content"
+            className="btn btn-xs sm:btn-sm glass-panel gap-1.5 text-white/80 hover:text-white border border-white/10 hover:border-cyan-400 font-mono text-xs rounded-xl"
             title="Copy candidate invite link"
           >
             {hasCopiedLink ? (
-              <CheckIcon className="w-3.5 h-3.5 text-success" />
+              <CheckIcon className="size-3.5 text-emerald-400" />
             ) : (
-              <Share2Icon className="w-3.5 h-3.5 text-primary" />
+              <Share2Icon className="size-3.5 text-cyan-400" />
             )}
-            <span>{hasCopiedLink ? "Link Copied!" : "Invite Candidate"}</span>
+            <span>{hasCopiedLink ? "Copied!" : "Invite Candidate"}</span>
           </button>
 
           {/* End Session Button for Host */}
@@ -258,19 +258,19 @@ function SessionPage() {
             <button
               onClick={handleEndSession}
               disabled={endSessionMutation.isPending}
-              className="btn btn-error btn-xs sm:btn-sm gap-1.5 text-white shadow-xs ml-1"
+              className="btn btn-error btn-xs sm:btn-sm gap-1.5 text-white shadow-xs ml-1 font-mono rounded-xl"
             >
               {endSessionMutation.isPending ? (
-                <Loader2Icon className="w-3.5 h-3.5 animate-spin" />
+                <Loader2Icon className="size-3.5 animate-spin" />
               ) : (
-                <LogOutIcon className="w-3.5 h-3.5" />
+                <LogOutIcon className="size-3.5" />
               )}
               <span>End Session</span>
             </button>
           )}
 
           {session?.status === "completed" && (
-            <span className="badge badge-ghost badge-sm">Completed</span>
+            <span className="badge badge-outline badge-sm font-mono">Completed</span>
           )}
         </div>
       </div>
@@ -280,19 +280,19 @@ function SessionPage() {
         {/* PANEL 1: PROBLEM DETAILS (LEFT COLUMN) */}
         <div
           style={{ width: `${leftWidth}px` }}
-          className="h-full overflow-y-auto bg-base-200/50 flex flex-col border-r border-base-300 min-w-[260px] max-w-[45vw] shrink-0"
+          className="h-full overflow-y-auto bg-[#080c16] flex flex-col border-r border-white/10 min-w-[260px] max-w-[45vw] shrink-0 font-sans"
         >
           {/* Header */}
-          <div className="p-3 bg-base-100 border-b border-base-300 flex items-center justify-between shrink-0">
+          <div className="p-3 bg-[#0a0f1c] border-b border-white/10 flex items-center justify-between shrink-0 font-mono">
             <div className="flex items-center gap-2 min-w-0">
-              <BookOpenIcon className="w-4 h-4 text-primary shrink-0" />
-              <h3 className="font-bold text-xs uppercase tracking-wider text-base-content truncate">
+              <BookOpenIcon className="size-4 text-cyan-400 shrink-0" />
+              <h3 className="font-bold text-xs uppercase tracking-wider text-white truncate">
                 Problem Description
               </h3>
             </div>
             {problemData?.category && (
-              <span className="text-[11px] text-base-content/60 truncate font-medium">
-                {problemData.category}
+              <span className="text-[11px] text-cyan-400/80 truncate font-medium">
+                #{problemData.category.toLowerCase().replace(/\s+/g, "-")}
               </span>
             )}
           </div>
@@ -300,10 +300,10 @@ function SessionPage() {
           {/* Problem Body */}
           <div className="p-4 space-y-4 flex-1 overflow-y-auto">
             <div>
-              <h3 className="text-lg font-bold text-base-content leading-tight">
+              <h3 className="text-lg font-bold text-white leading-tight font-mono">
                 {session?.problem || "Problem"}
               </h3>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2 mt-1 font-mono text-xs">
                 <span
                   className={`badge badge-xs text-[10px] ${getDifficultyBadgeClass(
                     session?.difficulty
@@ -311,7 +311,7 @@ function SessionPage() {
                 >
                   {session?.difficulty || "Easy"}
                 </span>
-                <span className="text-xs text-base-content/60">
+                <span className="text-xs text-white/50">
                   Host: {session?.host?.name || "Interviewer"}
                 </span>
               </div>
@@ -319,14 +319,14 @@ function SessionPage() {
 
             {/* DESCRIPTION */}
             {problemData?.description && (
-              <div className="bg-base-100 rounded-xl p-3.5 border border-base-300 shadow-xs space-y-2">
-                <h4 className="text-xs font-bold text-base-content uppercase tracking-wider">
+              <div className="glass-panel rounded-xl p-3.5 border border-white/10 shadow-xs space-y-2">
+                <h4 className="text-xs font-bold font-mono text-cyan-400 uppercase tracking-wider">
                   Overview
                 </h4>
-                <div className="space-y-2 text-xs leading-relaxed text-base-content/90">
+                <div className="space-y-2 text-xs leading-relaxed text-white/80">
                   <p>{problemData.description.text}</p>
                   {problemData.description.notes?.map((note, idx) => (
-                    <p key={idx} className="text-base-content/75 italic">
+                    <p key={idx} className="text-white/60 italic font-mono text-[11px]">
                       {note}
                     </p>
                   ))}
@@ -336,28 +336,28 @@ function SessionPage() {
 
             {/* EXAMPLES */}
             {problemData?.examples && problemData.examples.length > 0 && (
-              <div className="bg-base-100 rounded-xl p-3.5 border border-base-300 shadow-xs space-y-3">
-                <h4 className="text-xs font-bold text-base-content uppercase tracking-wider">
+              <div className="glass-panel rounded-xl p-3.5 border border-white/10 shadow-xs space-y-3">
+                <h4 className="text-xs font-bold font-mono text-purple-400 uppercase tracking-wider">
                   Examples
                 </h4>
-                <div className="space-y-3">
+                <div className="space-y-3 font-mono text-xs">
                   {problemData.examples.map((example, idx) => (
                     <div key={idx} className="space-y-1.5">
-                      <span className="badge badge-ghost badge-xs font-medium">
+                      <span className="badge badge-ghost badge-xs font-medium text-white/60">
                         Example {idx + 1}
                       </span>
-                      <div className="bg-base-200/90 rounded-lg p-2.5 font-mono text-xs space-y-1 border border-base-300/60">
+                      <div className="bg-black/40 rounded-lg p-2.5 font-mono text-xs space-y-1 border border-white/5">
                         <div className="flex gap-2">
-                          <span className="text-primary font-bold min-w-12">Input:</span>
-                          <span className="text-base-content/90 break-all">{example.input}</span>
+                          <span className="text-cyan-400 font-bold min-w-12">Input:</span>
+                          <span className="text-white/90 break-all">{example.input}</span>
                         </div>
                         <div className="flex gap-2">
-                          <span className="text-secondary font-bold min-w-12">Output:</span>
-                          <span className="text-base-content/90 break-all">{example.output}</span>
+                          <span className="text-emerald-400 font-bold min-w-12">Output:</span>
+                          <span className="text-emerald-300 break-all">{example.output}</span>
                         </div>
                         {example.explanation && (
-                          <div className="pt-1.5 border-t border-base-300/80 mt-1 font-sans text-[11px] text-base-content/70">
-                            <span className="font-semibold text-base-content">Explanation: </span>
+                          <div className="pt-1.5 border-t border-white/5 mt-1 font-sans text-[11px] text-white/50">
+                            <span className="font-semibold text-white/70">Explanation: </span>
                             {example.explanation}
                           </div>
                         )}
@@ -370,15 +370,15 @@ function SessionPage() {
 
             {/* CONSTRAINTS */}
             {problemData?.constraints && problemData.constraints.length > 0 && (
-              <div className="bg-base-100 rounded-xl p-3.5 border border-base-300 shadow-xs space-y-2">
-                <h4 className="text-xs font-bold text-base-content uppercase tracking-wider">
+              <div className="glass-panel rounded-xl p-3.5 border border-white/10 shadow-xs space-y-2">
+                <h4 className="text-xs font-bold font-mono text-amber-400 uppercase tracking-wider">
                   Constraints
                 </h4>
-                <ul className="space-y-1 text-xs text-base-content/90">
+                <ul className="space-y-1 text-xs font-mono text-white/80">
                   {problemData.constraints.map((constraint, idx) => (
                     <li key={idx} className="flex items-start gap-1.5">
-                      <span className="text-primary font-bold mt-0.5">•</span>
-                      <code className="bg-base-200 px-1 py-0.5 rounded text-[11px]">
+                      <span className="text-amber-400 font-bold mt-0.5">•</span>
+                      <code className="bg-white/5 px-1 py-0.5 rounded text-[11px] text-amber-200">
                         {constraint}
                       </code>
                     </li>
@@ -392,14 +392,14 @@ function SessionPage() {
         {/* LEFT DRAG SPLITTER */}
         <div
           onMouseDown={handleLeftDrag}
-          className="w-1.5 bg-base-300 hover:bg-primary transition-colors cursor-col-resize shrink-0 flex items-center justify-center group"
+          className="w-1.5 bg-white/10 hover:bg-cyan-400 transition-colors cursor-col-resize shrink-0 flex items-center justify-center group"
           title="Drag to resize Problem Description"
         >
-          <GripVerticalIcon className="w-3 h-3 text-base-content/30 group-hover:text-white" />
+          <GripVerticalIcon className="size-3 text-white/30 group-hover:text-black" />
         </div>
 
         {/* PANEL 2: MONACO CODE EDITOR & OUTPUT CONSOLE (CENTER COLUMN) */}
-        <div className="flex-1 min-w-[320px] h-full flex flex-col min-h-0 overflow-hidden">
+        <div className="flex-1 min-w-[320px] h-full flex flex-col min-h-0 overflow-hidden bg-[#0b0f19]">
           {/* Top Monaco Editor Area */}
           <div className="flex-1 min-h-0 min-w-0 overflow-hidden">
             <CodeEditorPanel
@@ -414,10 +414,10 @@ function SessionPage() {
           {/* HORIZONTAL DRAG SPLITTER */}
           <div
             onMouseDown={handleOutputDrag}
-            className="h-1.5 bg-base-300 hover:bg-primary transition-colors cursor-row-resize shrink-0 flex items-center justify-center group"
+            className="h-1.5 bg-white/10 hover:bg-cyan-400 transition-colors cursor-row-resize shrink-0 flex items-center justify-center group"
             title="Drag to resize Console"
           >
-            <GripHorizontalIcon className="w-3 h-3 text-base-content/30 group-hover:text-white" />
+            <GripHorizontalIcon className="size-3 text-white/30 group-hover:text-black" />
           </div>
 
           {/* Bottom Execution Console Area */}
@@ -432,35 +432,35 @@ function SessionPage() {
         {/* RIGHT DRAG SPLITTER */}
         <div
           onMouseDown={handleRightDrag}
-          className="w-1.5 bg-base-300 hover:bg-primary transition-colors cursor-col-resize shrink-0 flex items-center justify-center group"
+          className="w-1.5 bg-white/10 hover:bg-cyan-400 transition-colors cursor-col-resize shrink-0 flex items-center justify-center group"
           title="Drag to resize Video & Chat"
         >
-          <GripVerticalIcon className="w-3 h-3 text-base-content/30 group-hover:text-white" />
+          <GripVerticalIcon className="size-3 text-white/30 group-hover:text-black" />
         </div>
 
         {/* PANEL 3: VIDEO CALL & CHAT (RIGHT COLUMN) */}
         <div
           style={{ width: `${rightWidth}px` }}
-          className="h-full bg-base-200/60 p-2 flex flex-col overflow-hidden border-l border-base-300 min-w-[280px] max-w-[45vw] shrink-0"
+          className="h-full bg-[#080c16] p-2 flex flex-col overflow-hidden border-l border-white/10 min-w-[280px] max-w-[45vw] shrink-0 font-sans"
         >
           <div className="flex-1 min-h-0 min-w-0 overflow-hidden flex flex-col">
             {isInitializingCall ? (
-              <div className="h-full flex items-center justify-center bg-base-100 rounded-xl p-4">
+              <div className="h-full flex items-center justify-center glass-panel rounded-2xl p-4">
                 <div className="text-center">
-                  <Loader2Icon className="w-8 h-8 mx-auto animate-spin text-primary mb-2" />
-                  <p className="font-semibold text-xs text-base-content">
-                    Connecting to Video & Chat...
+                  <Loader2Icon className="size-8 mx-auto animate-spin text-cyan-400 mb-2" />
+                  <p className="font-semibold font-mono text-xs text-white">
+                    Connecting to WebRTC Peer Mesh...
                   </p>
                 </div>
               </div>
             ) : !streamClient || !call ? (
-              <div className="h-full flex items-center justify-center bg-base-100 rounded-xl p-4">
-                <div className="card max-w-xs text-center">
-                  <div className="w-12 h-12 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <PhoneOffIcon className="w-6 h-6 text-error" />
+              <div className="h-full flex items-center justify-center glass-panel rounded-2xl p-4">
+                <div className="card max-w-xs text-center font-mono">
+                  <div className="size-12 bg-rose-500/10 border border-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-2 text-rose-400">
+                    <PhoneOffIcon className="size-6" />
                   </div>
-                  <h4 className="font-bold text-sm text-base-content mb-1">Call Disconnected</h4>
-                  <p className="text-xs text-base-content/70">
+                  <h4 className="font-bold text-sm text-white mb-1">Call Disconnected</h4>
+                  <p className="text-xs text-white/50">
                     Unable to connect to WebRTC stream
                   </p>
                 </div>

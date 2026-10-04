@@ -49,12 +49,17 @@ function DashboardPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-base-300">
+      <div className="min-h-screen bg-[#070a12] text-base-content relative overflow-hidden">
+        {/* AMBIENT BACKGROUND GLOW & CYBER GRID */}
+        <div className="absolute inset-0 cyber-grid opacity-25 pointer-events-none" />
+        <div className="absolute -top-32 left-1/3 w-[600px] h-[400px] bg-gradient-to-tr from-cyan-600/15 via-purple-600/15 to-transparent blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-10 -right-20 w-[500px] h-[500px] bg-gradient-to-br from-primary/10 to-transparent blur-[130px] rounded-full pointer-events-none" />
+
         <Navbar />
         <WelcomeSection onCreateSession={() => setShowCreateModal(true)} />
 
         {/* Grid layout */}
-        <div className="container mx-auto px-6 pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <StatsCards
               activeSessionsCount={activeSessions.length}
