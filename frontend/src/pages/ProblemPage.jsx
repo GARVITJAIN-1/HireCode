@@ -7,7 +7,7 @@ import { Panel, Group, Separator } from "react-resizable-panels";
 import ProblemDescription from "../components/ProblemDescription";
 import OutputPanel from "../components/OutputPanel";
 import CodeEditorPanel from "../components/CodeEditorPanel";
-// import { executeCode } from "../lib/piston";
+import { executeCode } from "../lib/piston";
 
 import toast from "react-hot-toast";
 // import confetti from "canvas-confetti";
@@ -43,60 +43,29 @@ function ProblemPage() {
 
   const handleProblemChange = (newProblemId) => navigate(`/problem/${newProblemId}`);
 
-//   const triggerConfetti = () => {
-//     confetti({
-//       particleCount: 80,
-//       spread: 250,
-//       origin: { x: 0.2, y: 0.6 },
-//     });
-
-//     confetti({
-//       particleCount: 80,
-//       spread: 250,
-//       origin: { x: 0.8, y: 0.6 },
-//     });
-//   };
-
-//   const normalizeOutput = (output) => {
-//     // normalize output for comparison (trim whitespace, handle different spacing)
-//     return output
-//       .trim()
-//       .split("\n")
-//       .map((line) =>
-//         line
-//           .trim()
-//           // remove spaces after [ and before ]
-//           .replace(/\[\s+/g, "[")
-//           .replace(/\s+\]/g, "]")
-//           // normalize spaces around commas to single space after comma
-//           .replace(/\s*,\s*/g, ",")
-//       )
-//       .filter((line) => line.length > 0)
-//       .join("\n");
-//   };
-
-//   const checkIfTestsPassed = (actualOutput, expectedOutput) => {
-//     const normalizedActual = normalizeOutput(actualOutput);
-//     const normalizedExpected = normalizeOutput(expectedOutput);
-
-//     return normalizedActual == normalizedExpected;
-//   };
-
   const handleRunCode = async () => {
-  setIsRunning(true);
-  setOutput(null);
+    setIsRunning(true);
+    setOutput(null);
 
-  const result = {
-    success: false,
-    error:
-      "Code execution is temporarily unavailable. The public Piston API is no longer publicly accessible. A self-hosted code execution service will be added soon.",
+    try {
+      const result = await executeCode(selectedLanguage, code);
+      setOutput(result);
+
+      if (result.success) {
+        toast.success("Execution completed successfully!");
+      } else {
+        toast.error("Execution finished with errors");
+      }
+    } catch (err) {
+      setOutput({
+        success: false,
+        error: err.message || "Execution failed",
+      });
+      toast.error("Code execution failed");
+    } finally {
+      setIsRunning(false);
+    }
   };
-
-  setOutput(result);
-  setIsRunning(false);
-
-  toast.error("Code execution is temporarily unavailable.");
-};
 
   return (
     <div className="h-screen bg-[#070a12] text-white flex flex-col overflow-hidden">

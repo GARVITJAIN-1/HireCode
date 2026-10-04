@@ -116,11 +116,16 @@ export async function endSession(req,res){
         }
 
         
-        const call=streamClient.video.call("default",session.callId)
-        await call.delete({hard:true})
-        
-        const channel=chatClient.channel("messaging",session.callId)
-        await channel.delete()
+        // End the call gracefully so participants are hung up and Stream preserves call timeline, duration, and participant history
+        try {
+            const call = streamClient.video.call("default", session.callId);
+            await call.end();
+        } catch (callErr) {
+            console.warn("Notice ending call in Stream:", callErr.message);
+        }
+
+        // We intentionally do NOT delete the chat channel so chat history remains stored in Stream.io!
+        // Optionally mark channel frozen if desired, but keep all message history intact.
 
         session.status="completed"
         await session.save()

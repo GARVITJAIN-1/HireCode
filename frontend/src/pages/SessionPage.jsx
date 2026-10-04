@@ -22,6 +22,7 @@ import useStreamClient from "../hooks/useStreamClient";
 import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
 import VideoCallUI from "../components/VideoCallUI";
 import toast from "react-hot-toast";
+import { executeCode } from "../lib/piston";
 
 function SessionPage() {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ function SessionPage() {
   const { user } = useUser();
 
   const [output, setOutput] = useState(null);
+  const [isRunning, setIsRunning] = useState(false);
   const [hasCopiedLink, setHasCopiedLink] = useState(false);
 
   // Controlled, reliable widths for all 3 panels so NONE can ever be crushed
@@ -61,7 +63,11 @@ function SessionPage() {
   );
 
   const problemData = session?.problem
-    ? Object.values(PROBLEMS).find((p) => p.title === session.problem)
+    ? Object.values(PROBLEMS).find(
+        (p) =>
+          p.title.toLowerCase().trim() === session.problem.toLowerCase().trim() ||
+          p.id.toLowerCase().trim() === session.problem.toLowerCase().trim()
+      )
     : null;
 
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
@@ -97,11 +103,27 @@ function SessionPage() {
   };
 
   const handleRunCode = async () => {
-    setOutput({
-      success: false,
-      error:
-        "Code execution is temporarily unavailable. The public Piston API is no longer publicly accessible. A self-hosted code execution service will be added soon.",
-    });
+    setIsRunning(true);
+    setOutput(null);
+
+    try {
+      const result = await executeCode(selectedLanguage, code);
+      setOutput(result);
+
+      if (result.success) {
+        toast.success("Execution completed successfully!");
+      } else {
+        toast.error("Execution finished with errors");
+      }
+    } catch (err) {
+      setOutput({
+        success: false,
+        error: err.message || "Execution failed",
+      });
+      toast.error("Code execution failed");
+    } finally {
+      setIsRunning(false);
+    }
   };
 
   const handleEndSession = () => {
@@ -405,6 +427,7 @@ function SessionPage() {
             <CodeEditorPanel
               selectedLanguage={selectedLanguage}
               code={code}
+              isRunning={isRunning}
               onLanguageChange={handleLanguageChange}
               onCodeChange={(value) => setCode(value)}
               onRunCode={handleRunCode}

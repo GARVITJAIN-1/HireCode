@@ -1,84 +1,61 @@
-// Piston API is a service for code execution
+import axiosInstance from "./axios";
 
-// const PISTON_API = "https://emkc.org/api/v2";
-
-const LANGUAGE_VERSIONS = {
-  javascript: { language: "javascript", version: "18.15.0" },
-  python: { language: "python", version: "3.10.0" },
-  java: { language: "java", version: "15.0.2" },
+const LANGUAGE_CONFIG = {
+  javascript: { language: "javascript" },
+  python: { language: "python" },
+  java: { language: "java" },
 };
 
 /**
- * @param {string} language - programming language
- * @param {string} code - source code to executed
- * @returns {Promise<{success:boolean, output?:string, error?: string}>}
+ * Execute code via backend compilation endpoint
+ * @param {string} language - programming language ('javascript', 'python', 'java')
+ * @param {string} code - source code to execute
+ * @returns {Promise<{success: boolean, output?: string, error?: string}>}
  */
 export async function executeCode(language, code) {
   try {
-    const languageConfig = LANGUAGE_VERSIONS[language];
-
-    if (!languageConfig) {
+    const langKey = (language || "").toLowerCase().trim();
+    if (!LANGUAGE_CONFIG[langKey]) {
       return {
         success: false,
         error: `Unsupported language: ${language}`,
       };
     }
 
-    const response = await fetch(`http://localhost:3000/api/code/execute`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        language: languageConfig.language,
-        version: languageConfig.version,
-        files: [
-          {
-            name: `main.${getFileExtension(language)}`,
-            content: code,
-          },
-        ],
-      }),
+    if (!code || !code.trim()) {
+      return {
+        success: false,
+        error: "Please write some code before running.",
+      };
+    }
+
+    const response = await axiosInstance.post("/code/execute", {
+      language: langKey,
+      code,
     });
 
-    if (!response.ok) {
+    const data = response.data;
+
+    // Standardized response from backend
+    if (data.success) {
       return {
-        success: false,
-        error: `HTTP error! status: ${response.status}`,
+        success: true,
+        output: data.output || "Program finished with no output.",
+        error: "",
       };
     }
 
-    const data = await response.json();
-
-    const output = data.run.output || "";
-    const stderr = data.run.stderr || "";
-
-    if (stderr) {
-      return {
-        success: false,
-        output: output,
-        error: stderr,
-      };
-    }
-
-    return {
-      success: true,
-      output: output || "No output",
-    };
-  } catch (error) {
     return {
       success: false,
-      error: `Failed to execute code: ${error.message}`,
+      output: data.output || "",
+      error: data.error || (data.run?.stderr) || "Execution failed",
+    };
+  } catch (error) {
+    console.error("Code execution error:", error);
+    const backendMessage = error.response?.data?.error || error.response?.data?.message;
+    return {
+      success: false,
+      error: backendMessage || error.message || "Failed to execute code. Check your network connection.",
     };
   }
-}
-
-function getFileExtension(language) {
-  const extensions = {
-    javascript: "js",
-    python: "py",
-    java: "java",
-  };
-
-  return extensions[language] || "txt";
 }
